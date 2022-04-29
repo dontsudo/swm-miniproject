@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "posts",
+  "info": {
+    "singularName": "post",
+    "pluralName": "posts",
+    "displayName": "Post",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "username": {
+      "type": "string",
+      "required": true,
+      "default": "익명",
+      "minLength": 2,
+      "maxLength": 15
+    },
+    "content": {
+      "type": "text",
+      "required": true,
+      "maxLength": 300,
+      "minLength": 5
+    },
+    "likes": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}
