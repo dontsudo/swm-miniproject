@@ -1,26 +1,30 @@
 <template>
-  <form>
+  <form @submit.prevent="onSubmit">
     <div class="mb-6">
-      <label for="email" class="block mb-2 text-sm font-medium"
+      <label for="username" class="block mb-2 text-sm font-medium"
         >재치있는 이름을 적어보세요!</label
       >
       <input
-        id="email"
+        id="username"
+        v-model="username"
         class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
         placeholder="ex) 13기 코딩왕"
         required
       />
     </div>
+
     <div class="mb-6">
-      <label for="message" class="block mb-2 text-sm font-medium"
+      <label for="content" class="block mb-2 text-sm font-medium"
         >여러분의 이야기를 남겨보세요!</label
       >
-
       <textarea
-        id="message"
-        rows="6"
+        id="content"
+        v-model="content"
         class="block p-2.5 w-full resize-none text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-        placeholder="하고 싶은 말을 적어주세요 👏"
+        placeholder="하고 싶은 말을 적어주세요 👏 (삭제 기능 없습니다!)"
+        rows="6"
+        minlength="5"
+        maxlength="300"
         required
       ></textarea>
     </div>
@@ -35,7 +39,33 @@
 </template>
 
 <script>
-export default {};
+import { usePostStore } from "../stores/post";
+
+export default {
+  data() {
+    return {
+      username: "",
+      content: "",
+    };
+  },
+  setup() {
+    const post = usePostStore();
+    const { createPost, getPosts } = post;
+
+    return {
+      createPost,
+      getPosts,
+    };
+  },
+  methods: {
+    onSubmit() {
+      this.createPost(this.username, this.content);
+
+      this.username = "";
+      this.content = "";
+    },
+  },
+};
 </script>
 
 <style></style>

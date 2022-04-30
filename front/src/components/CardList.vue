@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="loading" class="loading">Loading...</div>
+    <Spinner v-if="loading" />
     <div v-if="error" class="error">{{ error }}</div>
     <div v-if="posts">
       <PostCard v-for="post in posts" v-bind:key="post.id" :post="post" />
@@ -9,44 +9,29 @@
 </template>
 
 <script>
-import axios from "axios";
+import { storeToRefs } from "pinia";
+import { usePostStore } from "../stores/post";
+
 import PostCard from "./PostCard.vue";
+import CardSkeleton from "./CardSkeleton.vue";
+import Spinner from "./Spinner.vue";
 
 export default {
-  components: { PostCard },
-  data() {
+  components: { PostCard, CardSkeleton, Spinner },
+  setup() {
+    const post = usePostStore();
+    const { posts, loading, error } = storeToRefs(post);
+    const { getPosts } = post;
+
+    getPosts(1, 10);
+
     return {
-      loading: false,
-      posts: [],
-      error: null,
+      posts,
+      loading,
+      error,
+
+      getPosts,
     };
-  },
-  created() {
-    this.fetchData(1, 10);
-  },
-  methods: {
-    fetchData(page, pageSize) {
-      this.error = this.posts = null;
-      this.loading = true;
-      axios
-        .get("/api/posts", {
-          params: {
-            sort: "id:desc",
-            "pagination[page]": page,
-            "pagination[pageSize]": pageSize,
-          },
-        })
-        .then(({ data }) => {
-          this.loading = false;
-          this.posts = data.data.map((post) => ({
-            id: post.id,
-            ...post.attributes,
-          }));
-        })
-        .catch((err) => {
-          this.error = err.toString();
-        });
-    },
   },
 };
 </script>
