@@ -22,7 +22,7 @@
     "content": {
       "type": "text",
       "required": true,
-      "maxLength": 300,
+      "maxLength": 1000,
       "minLength": 5
     },
     "likes": {
