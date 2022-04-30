@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import _ from "lodash";
 import axios from "axios";
 
 export const usePostStore = defineStore({
@@ -7,30 +8,41 @@ export const usePostStore = defineStore({
     posts: [],
     loading: false,
     error: null,
+
+    page: 1,
+    pageSize: 10,
+    hasMorePost: true,
   }),
   actions: {
-    getPosts(page, pageSize) {
-      this.error = this.posts = null;
-      this.loading = true;
-      axios
-        .get("/api/posts", {
-          params: {
-            sort: "id:desc",
-            "pagination[page]": page,
-            "pagination[pageSize]": pageSize,
-          },
-        })
-        .then(({ data }) => {
+    getPosts: _.throttle(async function () {
+      if (this.hasMorePost) {
+        this.error = null;
+        this.loading = true;
+
+        try {
+          const { data } = await axios.get("/api/posts", {
+            params: {
+              sort: "id:desc",
+              "pagination[page]": this.page,
+              "pagination[pageSize]": this.pageSize,
+            },
+          });
           this.loading = false;
-          this.posts = data.data.map((post) => ({
+
+          const newPosts = data.data.map((post) => ({
             id: post.id,
             ...post.attributes,
           }));
-        })
-        .catch((err) => {
+          this.posts = [...this.posts, ...newPosts];
+          this.page++;
+          this.hasMorePost = data.data.length === 10;
+        } catch (err) {
           this.error = err.toString();
-        });
-    },
+          return;
+        }
+      }
+    }, 1000),
+
     createPost(username, content) {
       axios
         .post("/api/posts", {
@@ -40,12 +52,17 @@ export const usePostStore = defineStore({
           },
         })
         .then(() => {
-          this.getPosts(1, 10);
+          this.posts = [];
+          this.page = 1;
+          this.hasMorePost = true;
+
+          this.getPosts();
         })
         .catch((err) => {
           this.error = err.toString();
         });
     },
+
     likePost(id) {
       axios
         .post(`/api/posts/${id}/like`)
