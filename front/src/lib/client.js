@@ -5,6 +5,6 @@ const client = axios.create({
 });
 
 client.defaults.baseURL =
-  process.env.NODE_ENV === "development" ? "/" : "http://146.56.146.29:1337/";
+  process.env.NODE_ENV === "development" ? "/" : "https://www.reeul.me/";
 
 export default client;

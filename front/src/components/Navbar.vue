@@ -1,7 +1,7 @@
 <template>
   <div>
     <header
-      class="fixed top-0 w-1/3 h-full hidden lg:flex flex-col justify-between bg-blue-500 text-white p-16"
+      class="fixed top-0 w-1/3 h-full hidden lg:flex flex-col justify-between bg-blue-500 text-white p-4 sm:p-12"
     >
       <div class="heading">
         <h1 class="text-8xl font-normal leading-normal">소대숲</h1>
