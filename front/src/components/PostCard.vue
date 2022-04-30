@@ -1,6 +1,6 @@
 <template>
   <section
-    class="flex justify-center align-middle bg-gray-100 border border-gray-200 shadow-md font-sans"
+    class="flex justify-center align-middle bg-gray-100 border border-gray-200 shadow-md font-sans m-6 rounded-lg"
   >
     <div class="w-1/12 flex justify-center items-center">
       <LikeButton :id="post.id" :likes="post.likes" />

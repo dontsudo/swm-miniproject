@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import _ from "lodash";
-import axios from "axios";
+import client from "../lib/client";
 
 export const usePostStore = defineStore({
   id: "post",
@@ -12,6 +12,7 @@ export const usePostStore = defineStore({
     page: 1,
     pageSize: 10,
     hasMorePost: true,
+    sortByLike: false,
   }),
   actions: {
     getPosts: _.throttle(async function () {
@@ -20,9 +21,10 @@ export const usePostStore = defineStore({
         this.loading = true;
 
         try {
-          const { data } = await axios.get("/api/posts", {
+          console.log(this.sortByLike ? "likes" : "id:desc");
+          const { data } = await client.get("/api/posts", {
             params: {
-              sort: "id:desc",
+              sort: this.sortByLike ? "likes:desc" : "id:desc",
               "pagination[page]": this.page,
               "pagination[pageSize]": this.pageSize,
             },
@@ -44,7 +46,7 @@ export const usePostStore = defineStore({
     }, 1000),
 
     createPost(username, content) {
-      axios
+      client
         .post("/api/posts", {
           data: {
             username,
@@ -64,15 +66,26 @@ export const usePostStore = defineStore({
     },
 
     likePost(id) {
-      axios
+      client
         .post(`/api/posts/${id}/like`)
         .then(() => {
           const post = this.posts.find((post) => post.id === id);
           post.likes += 1;
+
+          this.posts = this.posts.sort((a, b) => b.likes - a.likes);
         })
         .catch((err) => {
           this.error = err.toString();
         });
+    },
+
+    toggleSortByLike(value) {
+      this.sortByLike = value;
+      this.posts = [];
+      this.page = 1;
+      this.hasMorePost = true;
+
+      this.getPosts();
     },
   },
 });
